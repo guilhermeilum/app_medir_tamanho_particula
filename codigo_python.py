@@ -4,6 +4,7 @@ import plotly.graph_objects as go
 from skimage import measure,color,io
 from os import path
 def area_particula(caminho_imagem):
+    lista_area =[]
     file = path.join(caminho_imagem) 
     try:
         image = io.imread(file)
@@ -18,7 +19,6 @@ def area_particula(caminho_imagem):
         numero_padrao = numero_padrao_correto()
     print("Preparando a imagem, isso pode demorar alguns segundos ou minutos.")
     labels, fig, props = tratamento_da_imagem(image, numero_padrao)
-    properties = ['area']
 
     # For each label, add a filled scatter trace for its contour,
     # and display the properties of the label in the hover of this trace.
@@ -29,8 +29,9 @@ def area_particula(caminho_imagem):
         hoverinfo = ''
         escala_quadrada = escala**2
         unidade = "\u03BCm²"
-        for prop_name in properties:
-            hoverinfo += f'<b>{prop_name}: {str(round(((getattr(props[index], prop_name))*escala_quadrada),2))+unidade}</b><br>'
+        area = round(((getattr(props[index], "area"))*escala_quadrada),2)
+        lista_area.append(area)
+        hoverinfo += f'<b>{"area"}: {str(area)+unidade}</b><br>'
         fig.add_trace(go.Scatter(
             x=x, y=y, name=label_i,
             mode='lines', fill='toself', showlegend=False,
