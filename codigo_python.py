@@ -12,21 +12,12 @@ def area_particula(caminho_imagem):
         return None
     escala = 0
     while escala ==0:
-        try:
-            escala = float(input("digite o valor da esvala em \u03BCm por px: "))
-        except(ValueError):
-            print("valor não compreendido")
+        escala = escala_função()
     numero_padrao = 0
     while numero_padrao == 0:
         numero_padrao = numero_padrao_correto()
     print("Preparando a imagem, isso pode demorar alguns segundos ou minutos.")
-    img= color.rgb2gray(image)
-    mask = img < numero_padrao
-    labels = measure.label(mask)
-    fig = px.imshow(img, binary_string=True)
-    fig.update_traces(hoverinfo='skip') # hover is only for label info
-
-    props = measure.regionprops(labels, img)
+    labels, fig, props = tratamento_da_imagem(image, numero_padrao)
     properties = ['area']
 
     # For each label, add a filled scatter trace for its contour,
@@ -46,6 +37,22 @@ def area_particula(caminho_imagem):
             hovertemplate=hoverinfo, hoveron='points+fills'))
 
     plotly.io.show(fig)
+
+def tratamento_da_imagem(image, numero_padrao):
+    img= color.rgb2gray(image)
+    mask = img < numero_padrao
+    labels = measure.label(mask)
+    fig = px.imshow(img, binary_string=True)
+    fig.update_traces(hoverinfo='skip') # hover is only for label info
+    props = measure.regionprops(labels, img)
+    return labels,fig,props
+
+def escala_função():
+    try:
+        escala = float(input("digite o valor da esvala em \u03BCm por px: "))
+    except(ValueError):
+        print("valor não compreendido")
+    return escala
 
 def numero_padrao_correto():
     numero_padrao = input('valor da sensibilidade da lable, não é aconcelhado mudar o valor, para continuar somente clique no "enter". ')
