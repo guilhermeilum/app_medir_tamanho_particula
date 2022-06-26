@@ -3,31 +3,22 @@ import plotly.express as px
 import plotly.graph_objects as go
 from skimage import measure,color,io
 from os import path
-from time import sleep
 def area_particula(caminho_imagem):
-    try:
-        escala = float(input("digite o valor da esvala em \u03BCm por px: "))
-    except(ValueError):
-        print("valor não compreedido")
-        sleep(0.5)
-        return
-    numero_padrao = input('valor da sensibilidade da lable, não é aconcelhado mudar o valor, para continuar somente clique no "enter". ')
-    if len(numero_padrao) == 0: 
-        numero_padrao = 0.56
-    else: 
-        try: 
-            numero_padrao = float(numero_padrao)
-        except(ValueError): 
-            print("valor não compreedido")
-            sleep(0.5)
-            return
     file = path.join(caminho_imagem) 
     try:
         image = io.imread(file)
     except(FileNotFoundError):
         print("local não identificado")
-        sleep(0.5)
-        return
+        return None
+    escala = 0
+    while escala ==0:
+        try:
+            escala = float(input("digite o valor da esvala em \u03BCm por px: "))
+        except(ValueError):
+            print("valor não compreendido")
+    numero_padrao = 0
+    while numero_padrao == 0:
+        numero_padrao = numero_padrao_correto()
     print("Preparando a imagem, isso pode demorar alguns segundos ou minutos.")
     img= color.rgb2gray(image)
     mask = img < numero_padrao
@@ -46,7 +37,7 @@ def area_particula(caminho_imagem):
         y, x = contour.T
         hoverinfo = ''
         escala_quadrada = escala**2
-        unidade = "\u03BCm"
+        unidade = "\u03BCm²"
         for prop_name in properties:
             hoverinfo += f'<b>{prop_name}: {str(round(((getattr(props[index], prop_name))*escala_quadrada),2))+unidade}</b><br>'
         fig.add_trace(go.Scatter(
@@ -55,4 +46,17 @@ def area_particula(caminho_imagem):
             hovertemplate=hoverinfo, hoveron='points+fills'))
 
     plotly.io.show(fig)
+
+def numero_padrao_correto():
+    numero_padrao = input('valor da sensibilidade da lable, não é aconcelhado mudar o valor, para continuar somente clique no "enter". ')
+    if len(numero_padrao) == 0: 
+        numero_padrao = 0.56
+    else:
+        try: 
+            numero_padrao = float(numero_padrao)
+        except(ValueError): 
+            print("valor não compreendido")
+            numero_padrao = 0
+    return numero_padrao
+
 area_particula(input("local da imagem: "))
